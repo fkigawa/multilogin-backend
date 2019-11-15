@@ -5,8 +5,10 @@ const auth = require('../auth');
 const Users = mongoose.model('Users');
 
 //POST new user route (optional, everyone has access)
-router.post('/', auth.optional, (req, res, next) => {
+router.post('/register', auth.optional, (req, res, next) => {
   const { body: { user } } = req;
+
+  console.log('user in register1', user)
 
   if(!user.email) {
     return res.status(422).json({
@@ -24,6 +26,8 @@ router.post('/', auth.optional, (req, res, next) => {
     });
   }
 
+  console.log('user in register', user)
+
   const finalUser = new Users(user);
 
   finalUser.setPassword(user.password);
@@ -34,6 +38,7 @@ router.post('/', auth.optional, (req, res, next) => {
 
 //POST login route (optional, everyone has access)
 router.post('/login', auth.optional, (req, res, next) => {
+  console.log('check req contents', req.body)
   const { body: { user } } = req;
 
   if(!user.email) {
@@ -62,7 +67,7 @@ router.post('/login', auth.optional, (req, res, next) => {
       const user = passportUser;
       user.token = passportUser.generateJWT();
 
-      return res.json({ resp: 'approved' });
+      return res.json({ userId: user.token, success: true });
     }
 
     return res.json({ resp: 'denied' });

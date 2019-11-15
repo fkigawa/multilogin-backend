@@ -1,14 +1,20 @@
+//npm packages to set up express framework + mongo database
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const cors = require('cors');
 const mongoose = require('mongoose');
+var MongoStore = require('connect-mongo')(session);
 const errorHandler = require('errorhandler');
 
-mongoose.promise = global.Promise;
+//requiring modularized files
+require('./models/Users')
+const passport = require('./config/passport');
 
-const isProduction = process.env.NODE_ENV === 'production';
+// mongoose.promise = global.Promise;
+
+const isProduction = process.env.NODE_ENV
 
 const app = express();
 
@@ -17,17 +23,24 @@ app.use(require('morgan')('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({ secret: 'passport-tutorial', cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false }));
+app.use(session({
+  secret: process.env.SECRET,
+  store: new MongoStore({mongooseConnection: require('mongoose').connection})
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 if(!isProduction) {
   app.use(errorHandler());
 }
 
-mongoose.connect('mongodb://fkigs:utah47@ds141168.mlab.com:41168/cg-processor');
+mongoose.connect(process.env.MONGODB_URI);
 mongoose.set('debug', true);
 
-require('./models/Users')
-require('./config/passport');
+
+// require('./config/passport');
 app.use(require('./routes'));
 
 if(!isProduction) {
