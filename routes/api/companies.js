@@ -1,3 +1,9 @@
+/*
+companies is currently a dummy set of endpoints, which will eventually be used for the app's functionality
+
+*/
+
+
 const mongoose = require('mongoose');
 const passport = require('passport');
 const router = require('express').Router();

@@ -1,14 +1,25 @@
+/*
+users is the heart of auth for this web app. In this file, there are three endpoints:
+/register
+/login
+/current
+*/
+
 const mongoose = require('mongoose');
 const passport = require('passport');
 const router = require('express').Router();
 const auth = require('../auth');
 const Users = mongoose.model('Users');
 
-//POST new user route (optional, everyone has access)
+/*
+/register is an endpoint that listens for information from a new user that wants to register an account
+
+First, the user email and password are checked for existence.
+Second, a new User is created with the user's email and the password is set by a salted hash.
+Third, upon saving the new User, json object is sent back to the client
+*/
 router.post('/register', auth.optional, (req, res, next) => {
   const { body: { user } } = req;
-
-  console.log('user in register1', user)
 
   if(!user.email) {
     return res.status(422).json({
@@ -26,8 +37,6 @@ router.post('/register', auth.optional, (req, res, next) => {
     });
   }
 
-  console.log('user in register', user)
-
   const finalUser = new Users(user);
 
   finalUser.setPassword(user.password);
@@ -36,9 +45,14 @@ router.post('/register', auth.optional, (req, res, next) => {
     .then(() => res.json({ user: finalUser.toAuthJSON() }));
 });
 
-//POST login route (optional, everyone has access)
+/*
+/login is an endpoint that listens for and validates user information from the client
+
+First, the user email and password are checked for existence.
+Second, the endpoint uses passport middleware to authenticate the email and password.
+Third, upon validation, a jwt token is generated. JSON object sent back to the client.
+*/
 router.post('/login', auth.optional, (req, res, next) => {
-  console.log('check req contents', req.body)
   const { body: { user } } = req;
 
   if(!user.email) {
@@ -63,7 +77,6 @@ router.post('/login', auth.optional, (req, res, next) => {
     }
 
     if(passportUser) {
-      console.log('works')
       const user = passportUser;
       user.token = passportUser.generateJWT();
 
@@ -74,7 +87,13 @@ router.post('/login', auth.optional, (req, res, next) => {
   })(req, res, next);
 });
 
-//GET current route (required, only authenticated users have access)
+/*
+/current is an endpoint that listens for a jwt token to maintain persistence.
+
+First, the auth middleware validates and decodes the jwt token.
+Second, the user id, stored within the jwt token, is used to find a user in the database.
+Third, JSON object is sent back to client.
+*/
 router.get('/current', auth.required, (req, res, next) => {
   const { payload: { id } } = req;
 
