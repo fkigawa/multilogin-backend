@@ -58,7 +58,6 @@ UsersSchema.methods.generateJWT = function() {
 /*
 On authentication, this function returns a JSON object with the following properties
 */
-
 UsersSchema.methods.toAuthJSON = function() {
   return {
     _id: this._id,

@@ -78,12 +78,10 @@ router.post('/login', auth.optional, (req, res, next) => {
 
     if(passportUser) {
       const user = passportUser;
-      user.token = passportUser.generateJWT();
-
-      return res.json({ userId: user.token, success: true });
+      return res.json({ auth: 'success', user: user.toAuthJSON() });
     }
 
-    return res.json({ resp: 'denied' });
+    return res.json({ auth: 'failure' });
   })(req, res, next);
 });
 
@@ -96,7 +94,7 @@ Third, JSON object is sent back to client.
 */
 router.get('/current', auth.required, (req, res, next) => {
   const { payload: { id } } = req;
-
+  
   return Users.findById(id)
     .then((user) => {
       if(!user) {
