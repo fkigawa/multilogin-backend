@@ -6,7 +6,6 @@ By using this capability within express, the web application maintains live all 
 const express = require('express');
 const router = express.Router();
 
-router.use('/auth', require('./auth'));
-router.use('/invest', require('./invest'));
+router.use('/users', require('./users'));
 
 module.exports = router;

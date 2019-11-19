@@ -17,7 +17,7 @@ const mongoose = require('mongoose');
 
 //requires modularized files
 require('./models/Users')
-const passport = require('./config/passport');
+const passport = require('./routes/api/auth/passport');
 
 const app = express();
 
