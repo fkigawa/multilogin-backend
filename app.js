@@ -18,6 +18,7 @@ require("dotenv").config();
 
 //requires modularized files
 require("./models/Users");
+require("./models/Books");
 const passport = require("./routes/api/auth/passport");
 
 const app = express();
