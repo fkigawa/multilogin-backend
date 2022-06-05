@@ -9,29 +9,34 @@ Cors works to ensure that requests from the client are coming from who they say 
 Mongoose connects the web application to the MongoDB database
 
 */
-const express = require('express');
-const path = require('path');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const mongoose = require('mongoose');
+const express = require("express");
+const path = require("path");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const mongoose = require("mongoose");
+require("dotenv").config();
 
 //requires modularized files
-require('./models/Users')
-const passport = require('./routes/api/auth/passport');
+require("./models/Users");
+const passport = require("./routes/api/auth/passport");
 
 const app = express();
 
 //initializes middleware
 //morgan makes server logging more human-readable
 app.use(cors());
-app.use(require('morgan')('dev'));
+app.use(require("morgan")("dev"));
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
-mongoose.connect(process.env.MONGODB_URI);
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useFindAndModify: false,
+  useUnifiedTopology: true,
+});
 
 //requires all other paths so that they are accessible
-app.use(require('./routes'));
+app.use(require("./routes"));
 
 //in the case of any errors
 app.use((err, req, res) => {
@@ -46,4 +51,4 @@ app.use((err, req, res) => {
 });
 
 //server hoisted to run on localhost 8000
-app.listen(8000, () => console.log('Server running on http://localhost:8000/'));
+app.listen(8000, () => console.log("Server running on http://localhost:8000/"));
